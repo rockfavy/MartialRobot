@@ -1,6 +1,7 @@
 ﻿using MartialRobot.Features.BasicRobotMovement.Commands;
 using MartialRobot.Features.BasicRobotMovement.Models;
 using MartialRobot.Features.GridBoundaries.Models;
+using MartialRobot.Features.ScentTracking;
 
 namespace MartialRobot.Tests.Features.BasicRobotMovement.Command
 {
@@ -335,6 +336,22 @@ namespace MartialRobot.Tests.Features.BasicRobotMovement.Command
             Assert.Equal(1, robot.Position.X);
             Assert.Equal(2, robot.Position.Y);
             Assert.False(robot.IsLost);
+        }
+
+        [Fact]
+        public void Execute_MovesOffGridWithScent_IgnoresMove()
+        {
+            var robot = new Robot(new CoordonatePoint(5, 3), Orientation.North);
+            var grid = new MarsGrid(5, 3);
+            var scentTracker = new ScentTracker();
+            scentTracker.AddScent(new CoordonatePoint(5, 3));
+            var command = new ForwardCommand();
+
+            command.Execute(robot, grid, scentTracker);
+
+            Assert.False(robot.IsLost);
+            Assert.Equal(5, robot.Position.X);
+            Assert.Equal(3, robot.Position.Y);
         }
 
         #endregion

@@ -1,11 +1,12 @@
 ﻿using MartialRobot.Features.BasicRobotMovement.Models;
 using MartialRobot.Features.GridBoundaries.Models;
+using MartialRobot.Features.ScentTracking;
 
 namespace MartialRobot.Features.BasicRobotMovement.Commands
 {
     public class LeftCommand : ICommand
     {
-        public void Execute(Robot robot, MarsGrid? grid = null)
+        public void Execute(Robot robot, MarsGrid? grid = null, ScentTracker? scentTracker = null)
         {
             if (robot.IsLost) return;
 
@@ -15,7 +16,7 @@ namespace MartialRobot.Features.BasicRobotMovement.Commands
 
     public class RightCommand : ICommand
     {
-        public void Execute(Robot robot, MarsGrid? grid = null)
+        public void Execute(Robot robot, MarsGrid? grid = null, ScentTracker? scentTracker = null)
         {
             if (robot.IsLost) return;
 
@@ -25,15 +26,17 @@ namespace MartialRobot.Features.BasicRobotMovement.Commands
 
     public class ForwardCommand : ICommand
     {
-        public void Execute(Robot robot, MarsGrid? grid = null)
+        public void Execute(Robot robot, MarsGrid? grid = null, ScentTracker? scentTracker = null)
         {
-            if (robot.IsLost) return;
+            if (robot.IsLost) 
+                return;
 
             var nextPosition = CalculateNextPosition(robot);
 
             if (grid != null && !grid.IsWithinBounds(nextPosition))
             {
-                robot.IsLost = true;
+                if (scentTracker != null && scentTracker.HasScent(robot.Position))                
+                    return;              
             }
             else
             {
