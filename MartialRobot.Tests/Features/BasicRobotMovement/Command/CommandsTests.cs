@@ -354,6 +354,40 @@ namespace MartialRobot.Tests.Features.BasicRobotMovement.Command
             Assert.Equal(3, robot.Position.Y);
         }
 
+        [Fact]
+        public void Execute_MovesOffGrid_AddsScentAtCurrentPosition()
+        {
+            var robot = new Robot(new CoordonatePoint(5, 3), Orientation.North);
+            var grid = new MarsGrid(5, 3);
+            var scentTracker = new ScentTracker();
+            var command = new ForwardCommand();
+
+            command.Execute(robot, grid, scentTracker);
+
+            Assert.True(scentTracker.HasScent(new CoordonatePoint(5, 3)));
+        }
+
+        [Fact]
+        public void Execute_MultipleRobotsLoseAtSameSpot_SecondRobotPrevented()
+        {
+            var grid = new MarsGrid(5, 3);
+            var scentTracker = new ScentTracker();
+
+            var robot1 = new Robot(new CoordonatePoint(5, 3), Orientation.North);
+            var command1 = new ForwardCommand();
+            command1.Execute(robot1, grid, scentTracker);
+
+            Assert.True(robot1.IsLost);
+            Assert.True(scentTracker.HasScent(new CoordonatePoint(5, 3)));
+
+            var robot2 = new Robot(new CoordonatePoint(5, 3), Orientation.North);
+            var command2 = new ForwardCommand();
+            command2.Execute(robot2, grid, scentTracker);
+
+            Assert.False(robot2.IsLost);
+            Assert.Equal(5, robot2.Position.X);
+            Assert.Equal(3, robot2.Position.Y);
+        }
         #endregion
 
     }

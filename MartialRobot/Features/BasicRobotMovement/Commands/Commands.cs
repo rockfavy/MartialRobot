@@ -28,15 +28,17 @@ namespace MartialRobot.Features.BasicRobotMovement.Commands
     {
         public void Execute(Robot robot, MarsGrid? grid = null, ScentTracker? scentTracker = null)
         {
-            if (robot.IsLost) 
-                return;
+            if (robot.IsLost) return;
 
             var nextPosition = CalculateNextPosition(robot);
 
             if (grid != null && !grid.IsWithinBounds(nextPosition))
             {
                 if (scentTracker != null && scentTracker.HasScent(robot.Position))                
-                    return;              
+                    return;                
+
+                robot.IsLost = true;
+                scentTracker?.AddScent(robot.Position);
             }
             else
             {
