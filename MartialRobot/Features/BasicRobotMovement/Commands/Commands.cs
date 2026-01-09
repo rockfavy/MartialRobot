@@ -1,10 +1,11 @@
 ﻿using MartialRobot.Features.BasicRobotMovement.Models;
+using MartialRobot.Features.GridBoundaries.Models;
 
 namespace MartialRobot.Features.BasicRobotMovement.Commands
 {
     public class LeftCommand : ICommand
     {
-        public void Execute(Robot robot)
+        public void Execute(Robot robot, MarsGrid? grid = null)
         {
             if (robot.IsLost) return;
 
@@ -14,7 +15,7 @@ namespace MartialRobot.Features.BasicRobotMovement.Commands
 
     public class RightCommand : ICommand
     {
-        public void Execute(Robot robot)
+        public void Execute(Robot robot, MarsGrid? grid = null)
         {
             if (robot.IsLost) return;
 
@@ -24,12 +25,20 @@ namespace MartialRobot.Features.BasicRobotMovement.Commands
 
     public class ForwardCommand : ICommand
     {
-        public void Execute(Robot robot)
+        public void Execute(Robot robot, MarsGrid? grid = null)
         {
             if (robot.IsLost) return;
 
             var nextPosition = CalculateNextPosition(robot);
-            robot.Position = nextPosition;
+
+            if (grid != null && !grid.IsWithinBounds(nextPosition))
+            {
+                robot.IsLost = true;
+            }
+            else
+            {
+                robot.Position = nextPosition;
+            }
         }
 
         private CoordonatePoint CalculateNextPosition(Robot robot)

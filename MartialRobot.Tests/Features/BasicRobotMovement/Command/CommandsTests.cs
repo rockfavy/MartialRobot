@@ -1,5 +1,6 @@
 ﻿using MartialRobot.Features.BasicRobotMovement.Commands;
 using MartialRobot.Features.BasicRobotMovement.Models;
+using MartialRobot.Features.GridBoundaries.Models;
 
 namespace MartialRobot.Tests.Features.BasicRobotMovement.Command
 {
@@ -296,6 +297,46 @@ namespace MartialRobot.Tests.Features.BasicRobotMovement.Command
                 Assert.Equal(-1, robot.Position.Y);
             }
         }
+
+        [Fact]
+        public void Execute_WithGrid_MovesWithinBounds()
+        {
+            var robot = new Robot(new CoordonatePoint(1, 1), Orientation.North);
+            var grid = new MarsGrid(5, 3);
+            var command = new ForwardCommand();
+
+            command.Execute(robot, grid);
+
+            Assert.Equal(1, robot.Position.X);
+            Assert.Equal(2, robot.Position.Y);
+            Assert.False(robot.IsLost);
+        }
+
+        [Fact]
+        public void Execute_MovesOffGrid_MarksRobotAsLost()
+        {
+            var robot = new Robot(new CoordonatePoint(5, 3), Orientation.North);
+            var grid = new MarsGrid(5, 3);
+            var command = new ForwardCommand();
+
+            command.Execute(robot, grid);
+
+            Assert.True(robot.IsLost);
+        }
+
+        [Fact]
+        public void Execute_NoGridProvided_MovesNormally()
+        {
+            var robot = new Robot(new CoordonatePoint(1, 1), Orientation.North);
+            var command = new ForwardCommand();
+
+            command.Execute(robot, null);
+
+            Assert.Equal(1, robot.Position.X);
+            Assert.Equal(2, robot.Position.Y);
+            Assert.False(robot.IsLost);
+        }
+
         #endregion
 
     }
